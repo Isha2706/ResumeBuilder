@@ -8,53 +8,85 @@ import Skills from "./components/Skills";
 import Projects from "./components/Projects";
 import Certifications from "./components/Certifications";
 import Education from "./components/Education";
-import UserForm from "./components/UserForm";
 
+import UserForm from "./form/UserForm";
 import data from "./database/Data";
 
-
 function App() {
-
   const [selectedId, setSelectedId] = useState(1);
-  // Selected databased on `id`
+  const [showForm, setShowForm] = useState(false);
+  const [formData, setFormData] = useState(null);
+
   const selectedData = data.find((item) => item.id === selectedId);
 
-  const handleInputChange = (e, section, index, key) => {
-    const value = e.target.value;
-    setFormData((prevData) => {
-      const updatedSection = [...prevData[section]];
-      if (typeof updatedSection[index] === "object" && key) {
-        updatedSection[index][key] = value; // Update nested field (e.g., title in experience)
-      } else {
-        updatedSection[index] = value; // Update if it's a string
-      }
-      return { ...prevData, [section]: updatedSection };
-    });
+  const handleLiveUpdate = (updatedData) => {
+    setFormData(updatedData);
   };
-  
+
+  const handleGenerateResume = (finalData) => {
+    setFormData(finalData);
+    setShowForm(false);
+  };
+
   return (
     <>
-    <div id="form">
-      <UserForm />
-    </div>
-    <div id="page">
-      <div id="btn">
-        <button onClick={() => setSelectedId(1)}>Resume 1</button>
-        <button onClick={() => setSelectedId(2)}>Resume 2</button>
+      <div id="left-side">
+        <div className="div-btn">
+          <button className="btn" onClick={() => setShowForm(true)}>
+            Generate your own
+          </button>
+          {showForm ? (
+            <div className="userForm">
+              <UserForm
+                onGenerateResume={handleGenerateResume}
+                onLiveUpdate={handleLiveUpdate}
+              />
+            </div>
+          ) : (
+            <>
+              <button className="btn" onClick={() => setSelectedId(1)}>
+                Resume 1
+              </button>
+              <button className="btn" onClick={() => setSelectedId(2)}>
+                Resume 2
+              </button>
+            </>
+          )}
+        </div>
       </div>
-      <div id="resume">
-      <Header personalInfo={selectedData.header} />
-      <Summary summaryData={selectedData.summary} />
-      <Experience experienceData={selectedData.experience}  />
-      <Skills skillData={selectedData.skills} />
-      <Projects projectData={selectedData.projects} />
-      <Certifications certificationData={selectedData.certifications} />
-      <Education educationData={selectedData.education}/>
+
+      <div id="page">
+        <div id="resume">
+          <Header
+            personalInfo={formData ? formData.header : selectedData.header}
+          />
+          <Summary
+            summaryData={formData ? formData.summary : selectedData.summary}
+          />
+          <Experience
+            experienceData={
+              formData ? formData.experience : selectedData.experience
+            }
+          />
+          <Skills
+            skillData={formData ? formData.skills : selectedData.skills}
+          />
+          <Projects
+            projectData={formData ? formData.projects : selectedData.projects}
+          />
+          <Certifications
+            certificationData={
+              formData ? formData.certifications : selectedData.certifications
+            }
+          />
+          <Education
+            educationData={
+              formData ? formData.education : selectedData.education
+            }
+          />
+        </div>
       </div>
-      
-    </div>
     </>
-    
   );
 }
 
